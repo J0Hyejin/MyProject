@@ -1,0 +1,204 @@
+--------------size----------------
+
+local s01 = Vector3.new(7, 2, 14)  ---start fog
+local s02 = Vector3.new(12, 12, 7) ---tutorial
+local s03 = Vector3.new(7, 8, 3)   ---room
+local s04 = Vector3.new(15, 9, 3)  ---puzzle
+local s05 = Vector3.new(30, 10, 1) ---maze
+local s06 = Vector3.new(13, 8, 1)  ---doctor
+local s07 = Vector3.new(13, 1, 20) ---stair(to jump)
+local s08 = Vector3.new(13, 4, 10)  ---jump end
+local s09 = Vector3.new(14, 4, 8)  ---nurse
+local s10 = Vector3.new(20, 10, 1) ---hall
+local s11 = Vector3.new(0.5, 15, 15) ---running
+
+-------------start Poz------------
+
+local p01 = Vector3.new(590, -18, 343)      ---start fog
+local p02 = Vector3.new(632.5, -14, 361.5)  ---tutorial
+local p03 = Vector3.new(631, -6, 245)       ---room
+local p04 = Vector3.new(553, 40, 813)       ---puzzle
+local p05 = Vector3.new(0, 7, 190)          ---maze
+local p06 = Vector3.new(708, -6, 264)       ---doctor
+local p07 = Vector3.new(708, -19, 237)      ---stair(to jump)
+local p08 = Vector3.new(-146, -80, 873)     ---jump end
+local p09 = Vector3.new(703, -36, 202)      ---nurse
+local p10 = Vector3.new(700, -32, 140)      ---hall
+local p11 = Vector3.new(30, 107.5, 230)    ---running
+
+----------------fog---------------
+
+local fogOn = false
+
+---------------sound--------------
+
+local audioId = "rbxassetid://223471024"  ---change later
+local audioPlayed = false
+
+---------------flag---------------
+
+local flag = false
+local flag0 = false
+local flag1 = false
+local flag2 = false
+local flag3 = false
+local flag4 = false
+local flag5 = false
+local flag6 = false
+local flag7 = false
+local flag8 = false
+local flag9 = false
+local flag10 = false
+
+--------------level---------------
+
+local level = 0
+
+------------function--------------
+
+function tpTo(part)
+	if flag == false then
+		flag = true
+		local character = part.Parent
+		local player = game.Players:GetPlayerFromCharacter(character)
+		local gui
+		if player then
+			gui = player.PlayerGui.Mono.English.K01
+		end
+		local humanoid = part.Parent:FindFirstChild("Humanoid")
+		if humanoid then
+			if level == 0 then  --start touch
+				if flag0 == false then
+					flag0 = true
+					script.Parent.Position = p02
+					script.Parent.Size = s02
+					wait(0.5)
+					level = 1
+				end
+			elseif level == 1 then  --end tutorial
+				if flag1 == false then
+					flag1 = true
+					humanoid.WalkSpeed = 0
+					level = 2
+					gui:TweenPosition(UDim2.new(0.25, 0, 0.8, 0, "Out", "Sine", 1))
+					wait(3.3)
+					gui:TweenPosition(UDim2.new(0.25, 0, 1.8, 0, "Out", "Sine", 1))
+					wait(0.1)
+					gui = player.PlayerGui.Mono.English.K02
+					gui:TweenPosition(UDim2.new(0.25, 0, 0.8, 0, "Out", "Sine", 1))
+					wait(3.3)
+					gui:TweenPosition(UDim2.new(0.25, 0, 1.8, 0, "Out", "Sine", 1))
+					wait(0.1)
+					humanoid.WalkSpeed = 16
+					script.Parent.Position = p03
+					script.Parent.Size = s03
+				end
+			elseif level == 2 then  --room to puzzle 
+				if flag2 == false then
+					flag2 = true
+					
+					gui = player.PlayerGui.Mono.English.K03
+					gui:TweenPosition(UDim2.new(0.25, 0, 0.8, 0, "Out", "Sine", 1))
+					wait(3.3)
+					gui:TweenPosition(UDim2.new(0.25, 0, 1.8, 0, "Out", "Sine", 1))
+					wait(0.1)
+					level = 3
+					gui = player.PlayerGui.Mono.English.K04
+					gui:TweenPosition(UDim2.new(0.25, 0, 0.8, 0, "Out", "Sine", 1))
+					wait(3.3)
+					gui:TweenPosition(UDim2.new(0.25, 0, 1.8, 0, "Out", "Sine", 1))
+					wait(0.1)
+					script.Parent.Position = p04
+					script.Parent.Size = s04
+				end
+			elseif level == 3 then  --puzzle to maze 
+				if flag3 == false then
+					flag3 = true
+					gui = player.PlayerGui.Mono.English.K05
+					gui:TweenPosition(UDim2.new(0.25, 0, 0.8, 0, "Out", "Sine", 1))
+					wait(3.3)
+					gui:TweenPosition(UDim2.new(0.25, 0, 1.8, 0, "Out", "Sine", 1))
+					wait(0.1)
+					level = 4
+					script.Parent.Position = p05
+					script.Parent.Size = s05
+				end
+			elseif level == 4 then  --maze to origin hall 미로맵 BGM 끝, 스테이지 클리어 TP 소리재생, 랜덤음악 1~3 시작
+				---maze sound off, hall sound on
+				if flag4 == false then
+					flag4 = true
+					gui = player.PlayerGui.Mono.English.K06
+					gui:TweenPosition(UDim2.new(0.25, 0, 0.8, 0, "Out", "Sine", 1))
+					wait(3.3)
+					gui:TweenPosition(UDim2.new(0.25, 0, 1.8, 0, "Out", "Sine", 1))
+					wait(0.1)
+					level = 6
+					gui = player.PlayerGui.Mono.English.K07
+					gui:TweenPosition(UDim2.new(0.25, 0, 0.8, 0, "Out", "Sine", 1))
+					wait(3.3)
+					gui:TweenPosition(UDim2.new(0.25, 0, 1.8, 0, "Out", "Sine", 1))
+					wait(0.1)
+					script.Parent.Position = p07
+					script.Parent.Size = s07
+				end
+			elseif level == 6 then  --stiar jump
+				if flag5 == false then
+					flag5 = true
+					gui = player.PlayerGui.Mono.English.K08
+					gui:TweenPosition(UDim2.new(0.25, 0, 0.8, 0, "Out", "Sine", 1))
+					wait(3.3)
+					gui:TweenPosition(UDim2.new(0.25, 0, 1.8, 0, "Out", "Sine", 1))
+					wait(0.1)
+					level = 7
+					gui = player.PlayerGui.Mono.English.K09
+					gui:TweenPosition(UDim2.new(0.25, 0, 0.8, 0, "Out", "Sine", 1))
+					wait(3.3)
+					gui:TweenPosition(UDim2.new(0.25, 0, 1.8, 0, "Out", "Sine", 1))
+					wait(0.1)
+					script.Parent.Position = p08
+					script.Parent.Size = s08
+				end
+			elseif level == 7 then  --end jump
+				if flag6 == false then
+					flag6 = true
+					gui = player.PlayerGui.Mono.English.K10
+					gui:TweenPosition(UDim2.new(0.25, 0, 0.8, 0, "Out", "Sine", 1))
+					wait(3.3)
+					gui:TweenPosition(UDim2.new(0.25, 0, 1.8, 0, "Out", "Sine", 1))
+					wait(0.1)
+					level = 7
+					script.Parent.Position = p10
+					script.Parent.Size = s10
+				end
+			elseif level == 8 then  --running hall
+				if flag7 == false then
+					flag7 = true
+					gui =player.PlayerGui.Mono.English.K11
+					gui:TweenPosition(UDim2.new(0.25, 0, 0.8, 0, "Out", "Sine", 1))
+					wait(3.3)
+					gui:TweenPosition(UDim2.new(0.25, 0, 1.8, 0, "Out", "Sine", 1))
+					wait(0.1)
+					level = 8
+					script.Parent.Position = p11
+					script.Parent.Size = s11
+				end
+			else  --end
+				if flag9 == false then
+					flag9 = true
+					gui = player.PlayerGui.Mono.English.K12
+					gui:TweenPosition(UDim2.new(0.25, 0, 0.8, 0, "Out", "Sine", 1))
+					wait(3.3)
+					gui:TweenPosition(UDim2.new(0.25, 0, 1.8, 0, "Out", "Sine", 1))
+					wait(0.1)
+				end
+			end
+		else
+			print("Humanoid is missing")
+		end
+		flag = false
+	end
+end
+
+script.Parent.Position = p01
+script.Parent.Size = s01
+script.Parent.Touched:Connect(tpTo)

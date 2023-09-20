@@ -1,0 +1,16 @@
+local gui = script.Parent
+local UIS = game:GetService("UserInputService")
+
+UIS.InputBegan:Connect(function(InputObject, Processed)
+	if gui.Position == UDim2.new(0.18, 0, 0.05, 0) then
+		if InputObject.KeyCode == Enum.KeyCode.R then
+			gui:TweenPosition(UDim2.new(0.18, 0, 1.08, 0, "Out", "Sine", 1))
+				gui = script.Parent.Parent.EndingRoll
+				local tweenInfo = TweenInfo.new(18, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+			gui:TweenPosition(UDim2.new(0, 0, -2.6, 0, "Out", "Sine", 0), "Out", "Sine", 18)
+			wait(22)  -- 5초 대기
+			game.Players.LocalPlayer:Kick("Thank's for playing! This is the end!")
+		end
+	end
+
+end)

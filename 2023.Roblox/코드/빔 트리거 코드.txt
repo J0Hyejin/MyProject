@@ -1,0 +1,172 @@
+--빔을 생성하는 트리거 코드
+
+----------object-----------
+
+local AO = workspace.Beam.Beams.AftOrangeBeam
+local AB0 = workspace.Beam.Beams.AftBlueBeam0
+local AB1 = workspace.Beam.Beams.AftBlueBeam1
+local AJ = workspace.Beam.Beams.JumpBar
+
+local walltrg = script.Parent
+
+---------position----------
+
+local trgStart = Vector3.new(175, 106, 230)
+local trgEnd = Vector3.new(206, 106, 230)
+local resetPoz = Vector3.new(180, 106, 207)
+
+local LSP = Vector3.new(125, 108, 233.8)  --x end 210
+local RSP = Vector3.new(125, 108, 226.2)
+local JSP = Vector3.new(130, 101, 230)
+
+local backHall = Vector3.new(701, -37, 132)  
+
+---------other-------------
+
+local blinkTime = 0.2
+local moveTime = 0.01
+local moveAdd = 2.45
+local c = 0
+local flag = true
+
+local counter = 0
+local audioId = "rbxassetid://1336754056"  ---change later
+local audioPlayed = false
+local sound = Instance.new("Sound")
+sound.SoundId = audioId
+sound.Parent = script.Parent
+---------function----------
+
+function playBee() --effect sound
+	if not audioPlayed then
+		audioPlayed = true
+		sound:Play()
+		audioPlayed = false
+	end
+end
+
+
+local function soleMove(obj, poz)
+	if poz == 0 then
+		obj.Position = LSP
+	else
+		obj.Position = RSP
+	end
+	
+	for i=0, 2 do
+		obj.Transparency = 1
+		obj.Position += Vector3.new(moveAdd, 0, 0)
+		wait(blinkTime)
+		obj.Transparency = 0.8
+		obj.Position += Vector3.new(moveAdd, 0, 0)
+		wait(blinkTime)
+	end
+	
+	playBee()
+	
+	obj.Transparency = 0
+	while obj.Position.X <= 210 do
+		obj.Position += Vector3.new(moveAdd, 0, 0)
+		wait(moveTime)
+	end
+end
+
+local function doubleMove(obj1, obj2)
+	obj1.Position = LSP
+	obj2.Position = RSP
+	
+	for i=0, 2 do
+		obj1.Transparency = 1
+		obj2.Transparency = 1
+		obj1.Position += Vector3.new(moveAdd, 0, 0)
+		obj2.Position += Vector3.new(moveAdd, 0, 0)
+		wait(blinkTime)
+		obj1.Transparency = 0.8
+		obj2.Transparency = 0.8	
+		obj1.Position += Vector3.new(moveAdd, 0, 0)
+		obj2.Position += Vector3.new(moveAdd, 0, 0)
+		wait(blinkTime)
+	end
+	
+	obj1.Transparency = 0
+	obj2.Transparency = 0
+	
+	playBee()
+	
+	while obj1.Position.X <= 210 do
+		obj1.Position += Vector3.new(moveAdd, 0, 0)
+		obj2.Position += Vector3.new(moveAdd, 0, 0)
+		wait(moveTime)
+	end
+end
+
+local function ResetPoz()
+	AO.Position = resetPoz
+	AB0.Position = resetPoz
+	AB1.Position = resetPoz
+	AJ.Position = resetPoz
+end
+
+
+
+local function rungame(part)
+			if flag and counter < 21 then  ---counter 개수: 빔 트리거 개수
+				flag = false
+				c = math.random(0,4)
+				if c == 0 then
+					print("O__")
+					soleMove(AO, 0)
+				elseif c == 1 then
+					print("_O_")
+					soleMove(AO, 1)
+				elseif c == 2 then
+					print("BB_")
+					doubleMove(AB0, AB1)
+				elseif c == 3 then
+					print("OB_")
+					doubleMove(AO, AB0)
+				else
+					print("BO_")
+					doubleMove(AB0, AO)
+				end
+				wait(0.1)
+				flag = true
+				counter += 1
+				print(counter)
+			elseif counter == 21 then   --- counter 개수
+				local humanoid = part.Parent:FindFirstChild("Humanoid")
+				if humanoid then
+					game.Lighting.FogColor = Color3.new(1,1,1)
+				while game.Lighting.FogEnd > 0 do
+					game.Lighting.FogEnd -= 4
+					wait(0.01)
+				end
+				humanoid.Parent:MoveTo(backHall)
+			
+				wait(1)
+					
+					while game.Lighting.FogEnd < 100 do
+						game.Lighting.FogEnd += 10
+						wait(0.01)
+					end
+					game.Lighting.FogEnd = 100000
+				end
+				workspace.sound.RunnigMapSound:Stop()
+			end
+	
+	
+	
+end
+
+
+ResetPoz()
+script.Parent.Touched:Connect(rungame)
+
+game.Players.PlayerAdded:Connect(function(Player)
+	Player.CharacterAdded:Connect(function(Char)
+		Char.Humanoid.Died:Connect(function()
+			wait(0.1)
+			counter = 0
+		end)
+	end)
+end)

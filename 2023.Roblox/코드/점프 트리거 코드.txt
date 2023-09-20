@@ -1,0 +1,74 @@
+--빔이 생성되는 트리거와 별개로 점프해서 피해야 하는
+--발판을 생성하는 트리거
+
+
+----------object-----------
+local AJ = workspace.Beam.Beams.JumpBar
+
+---------position----------
+local resetPoz = Vector3.new(180, 106, 207)
+--x end 210
+local JSP = Vector3.new(130, 101, 230)
+
+---------other-------------
+
+local blinkTime = 0.2
+local moveTime = 0.01
+local moveAdd = 2.45
+local c = 0
+local flag = true
+local audioId = "rbxassetid://180204650"  ---change later
+local audioPlayed = false
+local sound = Instance.new("Sound")
+sound.SoundId = audioId
+sound.Parent = script.Parent
+---------function----------
+
+function playBee() --effect sound
+	if not audioPlayed then
+		audioPlayed = true
+		sound:Play()
+		audioPlayed = false
+	end
+end
+
+local function ResetPoz()
+	AJ.Position = resetPoz
+end
+
+
+local function rungame(part)
+	if flag then
+		flag = false
+		c = math.random(1,3)
+		print("jump: ",c)
+		if c == 2 then
+			print("blink")
+			AJ.Position = JSP
+			for i=0, 2 do
+				AJ.Transparency = 1
+				AJ.Position += Vector3.new(moveAdd, 0, 0)
+				wait(blinkTime)
+				AJ.Transparency = 0.8
+				AJ.Position += Vector3.new(moveAdd, 0, 0)
+				wait(blinkTime)
+			end
+			
+			playBee()
+
+			AJ.Transparency = 0
+			while AJ.Position.X <= 210 do
+				AJ.Position += Vector3.new(moveAdd, 0, 0)
+				wait(moveTime)
+			end
+			ResetPoz()
+		end
+		wait(0.1)
+		flag = true
+	end
+	
+end
+
+
+ResetPoz()
+script.Parent.Touched:Connect(rungame)

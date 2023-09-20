@@ -1,0 +1,288 @@
+---이동식 텔레포트
+
+--------------size----------------
+
+local s01 = Vector3.new(7, 2, 14)  ---start fog
+local s02 = Vector3.new(12, 12, 7) ---tutorial
+local s03 = Vector3.new(7, 8, 3)   ---room
+local s04 = Vector3.new(15, 9, 3)  ---puzzle
+local s05 = Vector3.new(30, 10, 1) ---maze
+local s06 = Vector3.new(13, 8, 1)  ---doctor
+local s07 = Vector3.new(13, 1, 20) ---stair(to jump)
+local s08 = Vector3.new(13, 4, 10)  ---jump end
+local s09 = Vector3.new(14, 4, 8)  ---nurse
+local s10 = Vector3.new(20, 10, 1) ---hall
+local s11 = Vector3.new(0.5, 15, 15) ---running
+
+-------------start Poz------------
+
+local p01 = Vector3.new(590, -18, 343)      ---start fog
+local p02 = Vector3.new(632.5, -14, 361.5)  ---tutorial
+local p03 = Vector3.new(631, -6, 245)       ---room
+local p04 = Vector3.new(553, 40, 813)       ---puzzle
+local p05 = Vector3.new(0, 7, 190)          ---maze
+local p06 = Vector3.new(708, -6, 264)       ---doctor
+local p07 = Vector3.new(708, -19, 237)      ---stair(to jump)
+local p08 = Vector3.new(-146, -80, 873)     ---jump end
+local p09 = Vector3.new(703, -36, 202)      ---nurse
+local p10 = Vector3.new(700, -32, 140)      ---hall
+local p11 = Vector3.new(30, 107.5, 230)    ---running
+
+-------------end Poz--------------
+
+local e01 = Vector3.new(639, -7.5, 235)       ---room(P02->e01)
+local e02 = Vector3.new(555, 38, 770)         ---other room(P03->e02)
+local e03 = Vector3.new(0.5, 2.5, -38.5)          ---maze(P04->e03)
+local e04 = Vector3.new(634, -9, 257)         ---hall(in front of the room)(P05->e04)
+local e05 = Vector3.new(-146, -10.5, 1140.5)  ---jumpmap(p07->e05)
+local e06 = Vector3.new(708, -19, 230)        ---stair(P08->e06)
+local e07 = Vector3.new(264, 101, 230)        ---to run(p10->e07)
+local e08 = Vector3.new(701, -37, 132)        ---hall(P11->e08)
+
+----------------fog---------------
+
+local fogOn = false
+
+---------------sound--------------
+
+local audioId = "rbxassetid://223471024"  ---change later
+local audioPlayed = false
+
+---------------flag---------------
+
+local flag = false
+local flag0 = false
+local flag1 = false
+local flag2 = false
+local flag3 = false
+local flag4 = false
+local flag5 = false
+local flag6 = false
+local flag7 = false
+local flag8 = false
+local flag9 = false
+local flag10 = false
+
+--------------level---------------
+
+local level = 0
+
+------------function--------------
+
+function playBee() --effect sound
+	if not audioPlayed then
+		audioPlayed = true
+		local sound = Instance.new("Sound")
+		sound.SoundId = audioId
+		sound.Parent = game.Workspace
+		sound:Play()
+		audioPlayed = false
+	end
+end
+
+
+
+function fogMake() --fog On
+	if fogOn == false then
+		fogOn = true
+		game.Lighting.FogColor = Color3.new(1, 1, 1)
+		while game.Lighting.FogEnd > 0 do
+			game.Lighting.FogEnd -= 100000
+			wait(0.01)
+		end
+		while game.Lighting.FogEnd < 70 do
+			game.Lighting.FogEnd += 7
+			wait(0.01)
+		end
+		game.Lighting.FogEnd = 70
+		print("fog on")
+	end
+end
+
+
+function fogRemove()  --fog off
+	if fogOn then
+		fogOn = false
+		game.Lighting.FogColor = Color3.new(1,1,1)
+		while game.Lighting.FogEnd < 100 do
+			game.Lighting.FogEnd += 10
+			wait(0.01)
+		end
+		game.Lighting.FogEnd = 100000
+		print("fog off")
+	end
+end
+
+workspace.sound.bgm1.Looped = true
+workspace.sound.bgm2.Looped = true
+workspace.sound.bgm3.Looped = true
+workspace.sound.JumpObbySound.Looped = true
+workspace.sound.PuzzleRoomSound.Looped = true
+workspace.sound.RunnigMapSound.Looped = true
+workspace.mazemap.Sound.BGM.Looped = true
+
+function playrandombgm()
+
+	local max = 2147483647 -- use a large integer
+	local seed = math.random(max)
+	local generator = Random.new(seed)
+	local newnum = generator:NextInteger(1,3)
+	
+	local sound1 = workspace.sound.bgm1
+	local sound2 = workspace.sound.bgm2
+	local sound3 = workspace.sound.bgm3
+	
+	allbgmstop()
+	
+	if newnum == 1 then
+		sound1:Play()
+	elseif newnum == 2 then
+		sound2:Play()
+	else
+		sound3:Play()
+	end
+end
+
+function allbgmstop()
+	print("bgm sound off")
+	workspace.sound.bgm1:Stop()
+	workspace.sound.bgm2:Stop()
+	workspace.sound.bgm3:Stop()
+	workspace.sound.JumpObbySound:Stop()
+	workspace.sound.PuzzleRoomSound:Stop()
+	workspace.sound.RunnigMapSound:Stop()
+end
+
+function tpTo(part)
+	if flag == false then
+		flag = true
+		local humanoid = part.Parent:FindFirstChild("Humanoid")
+		
+		if humanoid ~= nil then
+			
+			print("tp level : "..level)
+			
+			if level == 0 then  --start touch(making fog) 랜덤음악 1~3 시작
+				if flag0 == false then
+					flag0 = true
+					print("game on")
+					script.Parent.Position = p02
+					script.Parent.Size = s02
+					fogMake()
+					level = 1
+					playrandombgm()
+				end
+			elseif level == 1 then  --end tutorial
+				if flag1 == false then
+					flag1 = true
+					print("tutorial end")
+					script.Parent.Position = p03
+					script.Parent.Size = s03
+					humanoid.Parent:MoveTo(e01)  --to room
+					fogRemove()
+					level = 2
+				end
+			elseif level == 2 then  --room to puzzle 랜덤음악 끝, 스테이지 시작 TP 소리재생, 퍼즐 BGM 시작
+				if flag2 == false then
+					flag2 = true
+					print("puzzle on")
+					script.Parent.Position = p04
+					script.Parent.Size = s04
+					humanoid.Parent:MoveTo(e02)  --to puzzle
+					fogMake()
+					level = 3	
+					allbgmstop()
+					workspace.sound.tpstart:Play()
+					workspace.sound.PuzzleRoomSound:Play()
+				end
+			elseif level == 3 then  --puzzle to maze 퍼즐 BGM 끝, 미로맵 BGM 시작 
+				if flag3 == false then
+					flag3 = true
+					print("maze on")
+					script.Parent.Position = p05
+					script.Parent.Size = s05
+					humanoid.Parent:MoveTo(e03)  --to maze
+					level = 4
+					allbgmstop()
+				end
+			elseif level == 4 then  --maze to origin hall 미로맵 BGM 끝, 스테이지 클리어 TP 소리재생, 랜덤음악 1~3 시작
+				---maze sound off, hall sound on
+				if flag4 == false then
+					flag4 = true
+					print("maze end")
+					script.Parent.Position = p07
+					script.Parent.Size = s07	
+					humanoid.Parent:MoveTo(e04)  --to hall
+					fogRemove()
+					level = 6
+					workspace.sound.tpclear:Play()
+					playrandombgm()
+					
+				end
+			elseif level == 6 then  --stair to jump map on 랜덤음악 1~3 끝, 스테이지 시작 TP 소리재생, 점프맵 BGM 시작
+				if flag6 == false then
+					flag6 = true
+					print("jump map")
+					script.Parent.Position = p08
+					script.Parent.Size = s08
+					humanoid.Parent:MoveTo(e05)  --to jump
+					fogMake()
+					level = 7
+					allbgmstop()
+					workspace.sound.tpstart:Play()
+					workspace.sound.JumpObbySound:Play()
+				end
+			elseif level == 7 then  --점프맵 BGM 끝, 스테이지 클리어 TP 소리재생, 랜덤음악 1~3 시작
+				if flag7 == false then
+					flag7 = true
+					print("back to stair")
+
+					script.Parent.Position = p10
+					script.Parent.Size = s10
+					humanoid.Parent:MoveTo(e06)  --back to stair
+					fogRemove()
+					level = 8
+					workspace.sound.tpclear:Play()
+					playrandombgm()
+				end
+			elseif level == 8  then  --hall to running map 랜덤음악 1~3 끝, 스테이지 시작 TP 소리재생
+				if flag9 == false then
+					flag9 = true
+					print("running on")
+
+					script.Parent.Position = p11
+					script.Parent.Size = s11
+					humanoid.Parent:MoveTo(e07)  --to run
+					fogMake()
+					level = 10
+					allbgmstop()
+					workspace.sound.tpstart:Play()	
+				end
+			else
+				if flag10 == false then  --end 러닝맵 BGM 끝, 스테이지 클리어 TP 소리재생, 랜덤음악 1~3 시작
+					flag10 = true
+					print("end")
+					humanoid.Parent:MoveTo(e08)  --to end
+					fogRemove()
+					workspace.sound.tpclear:Play()
+					playrandombgm()
+				end
+				
+				
+			end
+			
+		wait(1)
+		
+			
+		else
+			print("humanoid nil")
+		end	
+		
+		flag = false
+	end
+end
+
+
+script.Parent.Position = p01
+script.Parent.Size = s01
+script.Parent.Touched:Connect(tpTo)
