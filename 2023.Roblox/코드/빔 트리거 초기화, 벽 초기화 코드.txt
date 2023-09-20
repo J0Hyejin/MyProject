@@ -1,0 +1,155 @@
+----blocking wall, reset trigger, moving wall----
+----object-----
+
+local deadWall = script.Parent.Parent.BlockWall
+local deadTrg = script.Parent
+
+local walltrg = workspace.Beam.BeamTrigger
+local jumptrg = workspace.Beam.JumpTrigger
+local wall1 = workspace.Beam.Walls.MoveBeamWall1
+local wall2 = workspace.Beam.Walls.MoveBeamWall2
+local wall3 = workspace.Beam.Walls.MoveBeamWall3
+
+local AO = workspace.Beam.Beams.AftOrangeBeam
+local AB0 = workspace.Beam.Beams.AftBlueBeam0
+local AB1 = workspace.Beam.Beams.AftBlueBeam1
+local AJ = workspace.Beam.Beams.JumpBar
+
+-----size------
+
+local wallSize = Vector3.new(1, 15, 15)
+local rsetSize = Vector3.new(12.5, 5, 15)
+
+------poz------
+
+local deadTrgPoz = Vector3.new(191, 107, 230)
+local rsetTrgPoz = Vector3.new(263.5, 103, 230)
+
+local downBimPoz = Vector3.new(202.5, 92.75, 230)
+local uperBimPoz = Vector3.new(202.5, 107.75, 230)
+
+local aPoz = Vector3.new(15, 107.75, 230) --wall3 reset poz
+local bPoz = Vector3.new(90, 107.75, 230) --wall1 reset poz
+local cPoz = Vector3.new(165, 107.75, 230)--wall2 reset poz
+local tPoz = Vector3.new(160, 106, 230)   --trg   reset poz,  to 210
+local resetPoz = Vector3.new(180, 106, 207)
+
+------flag-----
+
+local flag = false
+local beamFlag = false  --reset beam(under bar)
+
+------etc------
+
+local moveTime = 0.01
+local moveAdd = 0.73
+
+------sound------
+local soundFolder = game.Workspace:WaitForChild("sound") 
+local soundAssetId = "rbxassetid://1835350516" -- "RunningMapSound"
+
+----function---
+
+function fogRemove()  --fog off
+	game.Lighting.FogColor = Color3.new(1,1,1)
+	while game.Lighting.FogEnd < 100 do
+		game.Lighting.FogEnd += 10
+		wait(0.01)
+	end
+	game.Lighting.FogEnd = 100000
+	print("fog off")
+end
+
+
+local function ResetPoz()
+	AO.Position = resetPoz
+	AB0.Position = resetPoz
+	AB1.Position = resetPoz
+	AJ.Position = resetPoz
+end
+
+
+local function wallMv(human)
+	while human.Health > 0 do
+		if wall1.Position.X >= 230 or wall2.Position.X >= 230 or 
+			wall3.Position.X >= 230 or walltrg.Position.X >= 200 or jumptrg.Position.X >= 200 then
+			if wall1.Position.X >= 230 then
+				wall1.Position = aPoz
+			elseif wall2.Position.X >= 230 then
+				wall2.Position = aPoz
+			elseif wall3.Position.X >= 230 then
+				wall3.Position = aPoz
+			elseif walltrg.Position.X >= 200 then
+				walltrg.Position = tPoz
+				print("walltrg reset")
+			else
+				jumptrg.Position = tPoz
+			end
+		else
+			wall1.Position += Vector3.new(moveAdd, 0, 0)
+			wall2.Position += Vector3.new(moveAdd, 0, 0)
+			wall3.Position += Vector3.new(moveAdd, 0, 0)
+			walltrg.Position += Vector3.new(moveAdd+0.2, 0, 0)
+			jumptrg.Position += Vector3.new(moveAdd+0.8, 0, 0)
+			wait(moveTime)
+		end
+	end
+	wall1.Position = aPoz
+	wall2.Position = bPoz
+	wall3.Position = cPoz
+	walltrg.Position = tPoz
+end
+
+
+local function onTouched(part)
+	if flag == false then
+		flag = true
+		if beamFlag == false then
+			beamFlag = true
+			print("run mode on")
+			local runningMapSound = workspace.sound.RunnigMapSound
+			runningMapSound:Play()
+			
+			runningMapSound.TimePosition = 16
+
+			deadTrg.Position = rsetTrgPoz
+			deadTrg.Size = rsetSize
+			while deadWall.Position.Y < uperBimPoz.Y do
+				deadWall.Position += Vector3.new(0,0.5,0)
+				wait(0.01)
+			end
+			local humanoid = part.Parent:FindFirstChild("Humanoid")
+			if humanoid then
+				if humanoid.Health > 0 then
+					wallMv(humanoid)
+				end
+			end
+			deadWall.Position = uperBimPoz
+		else
+			beamFlag = false
+			print("run mode reset")
+			ResetPoz()
+			deadTrg.Position = deadTrgPoz
+			deadTrg.Size = wallSize
+			while deadWall.Position.Y > downBimPoz.Y do
+				deadWall.Position -= Vector3.new(0, 0.5, 0)
+				wait(0.01)
+			end
+			deadWall.Position = downBimPoz
+			wall1.Position = aPoz
+			wall2.Position = bPoz
+			wall3.Position = cPoz
+			walltrg.Position = tPoz
+		end
+		flag = false
+	end
+end 
+
+deadTrg.Position = deadTrgPoz
+deadTrg.Size = wallSize
+deadWall.Position = downBimPoz
+
+wall1.Position = aPoz
+wall2.Position = bPoz
+wall3.Position = cPoz
+script.Parent.Touched:Connect(onTouched)
